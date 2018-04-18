@@ -1,0 +1,102 @@
+version: 1
+dn: ou=people,dc=ldap,dc=adop,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: people
+
+dn: cn=gerrit,ou=people,dc=ldap,dc=adop,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: gerrit
+displayName: gerrit
+givenName: gerrit
+mail: gerrit@ldap.adop.com
+sn: gerrit
+uid: gerrit
+userPassword:: 123Qwe123
+
+dn: cn=jenkins,ou=people,dc=ldap,dc=adop,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: jenkins
+displayName: jenkins
+givenName: jenkins
+mail: jenkins@ldap.adop.com
+sn: jenkins
+uid: jenkins
+userPassword:: 123Qwe123
+
+dn: cn=nexus,ou=people,dc=ldap,dc=adop,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: nexus
+displayName: nexus
+givenName: nexus
+mail: nexus@ldap.adop.com
+sn: nexus
+uid: nexus
+userPassword:: Accenture01
+
+dn: cn=john.smith,ou=people,dc=ldap,dc=adop,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: john.smith
+displayName: Admin User
+givenName: Admin
+mail: john.smith@ldap.adop.com
+sn: User
+uid: john.smith
+userPassword:: Accenture01
+
+dn: ou=groups,dc=ldap,dc=adop,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+
+dn: cn=administrators,ou=groups,dc=ldap,dc=adop,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: administrators
+uniqueMember: cn=jenkins,ou=people,dc=ldap,dc=adop,dc=com
+uniqueMember: cn=john.smith,ou=people,dc=ldap,dc=adop,dc=com
+
+dn: cn=sonar-administrators,ou=groups,dc=ldap,dc=adop,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: sonar-administrators
+uniqueMember: cn=john.smith,ou=people,dc=ldap,dc=adop,dc=com
+
+dn: cn=sonar-users,ou=groups,dc=ldap,dc=adop,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: sonar-users
+uniqueMember: cn=john.smith,ou=people,dc=ldap,dc=adop,dc=com
+
+dn: cn=nx-admin,ou=groups,dc=ldap,dc=adop,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: nx-admin
+uniqueMember: cn=nexus,ou=people,dc=ldap,dc=adop,dc=com
+uniqueMember: cn=john.smith,ou=people,dc=ldap,dc=adop,dc=com
+
+dn: cn=nx-developer,ou=groups,dc=ldap,dc=adop,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: nx-developer
+uniqueMember: cn=nexus,ou=people,dc=ldap,dc=adop,dc=com
+uniqueMember: cn=john.smith,ou=people,dc=ldap,dc=adop,dc=com
+
+dn: cn=nx-deployment,ou=groups,dc=ldap,dc=adop,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: nx-deployment
+uniqueMember: cn=nexus,ou=people,dc=ldap,dc=adop,dc=com
+uniqueMember: cn=john.smith,ou=people,dc=ldap,dc=adop,dc=com
