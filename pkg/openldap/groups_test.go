@@ -20,11 +20,10 @@ var GitlabAPI = gitlab.API{
 }
 
 func TestGetGroup(t *testing.T) {
-
 	// get nx-admin and administrators group
 	group, err := openldap.GetGroup("dc=ldap,dc=adop,dc=com", "administrators", "nx-admin")
 	if err != nil {
-		fmt.Printf("error: %v\n", err)
+		t.Fatalf("error: %v\n", err)
 	}
 
 	// print results
@@ -33,28 +32,26 @@ func TestGetGroup(t *testing.T) {
 			fmt.Printf("Group: %s, Member: %s\n", group[i].cn, group[i].uniqueMembers[j])
 		}
 	}
-
 }
-func TestGetGroupList(t *testing.T) {
 
+func TestGetGroupList(t *testing.T) {
 	// test get group list
 	groups, err := openldap.GetGroupList("dc=ldap,dc=adop,dc=com")
 	if err != nil {
-		fmt.Printf("error: %v\n", err)
+		t.Fatalf("error: %v\n", err)
 	}
 
 	// print results
 	for j := 0; j < len(groups); j++ {
 		fmt.Println("Groups:" + groups[j])
 	}
-
 }
-func TestSyncGroup(t *testing.T) {
 
+func TestSyncGroup(t *testing.T) {
 	// get group list
 	groupList, err := openldap.GetGroupList("dc=ldap,dc=adop,dc=com")
 	if err != nil {
-		fmt.Printf("error: %v\n", err)
+		t.Fatalf("error: %v\n", err)
 	}
 
 	// get groups
