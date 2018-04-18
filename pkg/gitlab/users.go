@@ -55,7 +55,9 @@ func (gitlab *API) CreateUser(user User) (*http.Response, *User, error) {
 	defer resp.Body.Close()
 
 	// Fill up the User struct with whatever is returned from the response Body
-	json.NewDecoder(resp.Body).Decode(&user)
+	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
+		return nil, nil, err
+	}
 	return resp, &user, nil
 }
 
