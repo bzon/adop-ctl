@@ -63,6 +63,10 @@ services:
     - GITLAB_SSH_PORT=10022
     - GITLAB_RELATIVE_URL_ROOT=
     - GITLAB_ROOT_PASSWORD=123qwe123
+    - GITLAB_SECRETS_DB_KEY_BASE=long-and-random-alphanumeric-string
+    - GITLAB_SECRETS_SECRET_KEY_BASE=long-and-random-alphanumeric-string
+    - GITLAB_SECRETS_OTP_KEY_BASE=long-and-random-alphanumeric-string
+    - LDAP_ENABLED=true
     - LDAP_LABEL=LDAP
     - LDAP_HOST=localhost
     - LDAP_PORT=389
