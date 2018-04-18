@@ -12,6 +12,7 @@ import (
 // Project JSON fields
 type Project struct {
 	ID                  int    `json:"id"`
+	Name                string `json:"name"`
 	Path                string `json:"path"`
 	Description         string `json:"description,omitempty"`
 	DefaultBranch       string `json:"default_branch,omitempty"`
@@ -79,7 +80,7 @@ func (gitlab *API) GetProjectByPath(projectPath string) (*http.Response, *Projec
 	encodedPath := url.QueryEscape(projectPath)
 	resp, err := gitlab.NewRequest("GET", "projects/"+encodedPath, nil, http.StatusOK)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("failed getting project by path: %+v", err)
 	}
 	var project Project
 	if err := json.NewDecoder(resp.Body).Decode(&project); err != nil {

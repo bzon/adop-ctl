@@ -4,26 +4,23 @@ import (
 	"testing"
 )
 
-var project = Project{
+var testProject = &Project{
+	Name:        "worldpeace",
 	Path:        "worldpeace",
 	Description: "promotes world peace",
-}
-
-func TestDeleteProjectByPath(t *testing.T) {
-	_, err := gitlab.CreateProject(
-		&Project{
-			Path: "root/dummy",
-		},
-	)
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = gitlab.DeleteProjectByPath("root/dummy")
-	if err != nil {
-		t.Fatal(err)
-	}
+	NamespaceID: 1, // root user namespace
 }
 
 func TestCreateProject(t *testing.T) {
+	_, err := gitlab.CreateProject(testProject)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
 
+func TestDeleteProjectByPath(t *testing.T) {
+	_, err := gitlab.DeleteProjectByPath("root/" + testProject.Path)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
