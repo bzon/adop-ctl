@@ -5,12 +5,13 @@ import (
 	"strings"
 
 	"github.com/bzon/adop-ctl/pkg/gitlab"
+	ldap "gopkg.in/ldap.v2"
 )
 
 // Group is an LDAP Group struct
 type Group struct {
-	cn            string
-	uniqueMembers []string
+	CN           string
+	uniqueMember []string
 }
 
 // GetGroup gets specific group(s) and return an array of openldap.Group
@@ -39,8 +40,8 @@ func (openldap *Client) GetGroup(baseDN string, groupName ...string) ([]Group, e
 
 				// Initialize only the group with the exact value
 				groups[j] = Group{
-					cn:            cn[i],
-					uniqueMembers: uniqueMembers,
+					CN:           cn[i],
+					uniqueMember: uniqueMembers,
 				}
 			}
 
@@ -68,8 +69,8 @@ func (openldap *Client) SyncGitlabGroup(ldapGroup []Group, GitlabAPI gitlab.API)
 	// loop through groups
 	for j := 0; j < len(ldapGroup); j++ {
 		gitlabGroup := gitlab.Group{
-			Name: ldapGroup[j].cn,
-			Path: "ldap_" + ldapGroup[j].cn,
+			Name: ldapGroup[j].CN,
+			Path: "ldap_" + ldapGroup[j].CN,
 		}
 
 		// Delete group
@@ -79,9 +80,9 @@ func (openldap *Client) SyncGitlabGroup(ldapGroup []Group, GitlabAPI gitlab.API)
 		GitlabAPI.CreateGroup(gitlabGroup)
 
 		// Loop through group
-		for i := 0; i < len(ldapGroup[j].uniqueMembers); i++ {
+		for i := 0; i < len(ldapGroup[j].uniqueMember); i++ {
 			// concatinate cn to get username
-			username := strings.Split(strings.Split(ldapGroup[j].uniqueMembers[i], ",")[0], "=")[1]
+			username := strings.Split(strings.Split(ldapGroup[j].uniqueMember[i], ",")[0], "=")[1]
 
 			member := gitlab.User{
 				Name:        username,
@@ -95,4 +96,31 @@ func (openldap *Client) SyncGitlabGroup(ldapGroup []Group, GitlabAPI gitlab.API)
 		}
 	}
 	return nil
+}
+
+// CreateGroup Ka allergy yung warnings
+func (openldap *Client) CreateGroup(baseDN string, ldapGroup Group) error {
+	addRequest := ldap.NewAddRequest("cn=" + ldapGroup.CN + ",ou=groups," + baseDN)
+
+	// default attributes for adop ldap group
+	addRequest.Attribute("objectClass", []string{"groupOfUniqueNames", "top"})
+
+	// assign values
+	addRequest.Attribute("cn", []string{ldapGroup.CN})
+	addRequest.Attribute("uniqueMember", ldapGroup.uniqueMember)
+
+	// Add group
+	return openldap.AddEntry(addRequest)
+
+}
+
+// DeleteGroup Ka allergy yung wanrnings
+func (openldap *Client) DeleteGroup(baseDN string, ldapGroup Group) error {
+
+	// Create Delete Request
+	deleteRequest := ldap.NewDelRequest("cn="+ldapGroup.CN+",ou=groups,"+baseDN, nil)
+
+	// Delete Group
+	return openldap.DeleteEntry(deleteRequest)
+
 }
