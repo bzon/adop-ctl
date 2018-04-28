@@ -39,7 +39,7 @@ type ProjectHook struct {
 	Token                    string `json:"token"`
 }
 
-// CreateProject creates a gitlab project using Project and a path where to create the project
+// CreateProject creates a gitlab project by accepting a struct of type *Project and returns the client http response.
 //
 // API doc: https://docs.gitlab.com/ce/api/projects.html#create-project
 func (gitlab *API) CreateProject(project *Project) (*http.Response, error) {
@@ -58,7 +58,7 @@ func (gitlab *API) CreateProject(project *Project) (*http.Response, error) {
 	return resp, nil
 }
 
-// GetSingleProject returns the project id
+// GetSingleProject searches for a project id and returns the client http response, and a struct of type *Project.
 //
 // API doc: https://docs.gitlab.com/ce/api/projects.html#get-single-project
 func (gitlab *API) GetSingleProject(projectID int) (*http.Response, *Project, error) {
@@ -73,7 +73,8 @@ func (gitlab *API) GetSingleProject(projectID int) (*http.Response, *Project, er
 	return resp, &project, nil
 }
 
-// GetProjectByPath returns the project id using the project path
+// GetProjectByPath accepts a projectPath of type string and returns the client http response, and a struct of type *Project.
+// This is meant to be used over GetSingleProject if the caller doesn't know the project id of the project.
 //
 // API doc: https://docs.gitlab.com/ce/api/projects.html#list-all-projects
 func (gitlab *API) GetProjectByPath(projectPath string) (*http.Response, *Project, error) {
@@ -89,7 +90,7 @@ func (gitlab *API) GetProjectByPath(projectPath string) (*http.Response, *Projec
 	return resp, &project, nil
 }
 
-// DeleteProject deletes a single project
+// DeleteProject deletes a single project by project id and returns the client http response.
 //
 // API doc: https://docs.gitlab.com/ce/api/projects.html#remove-project
 func (gitlab *API) DeleteProject(projectID int) (*http.Response, error) {
@@ -100,7 +101,8 @@ func (gitlab *API) DeleteProject(projectID int) (*http.Response, error) {
 	return resp, nil
 }
 
-// DeleteProjectByPath deletes a project using project path
+// DeleteProjectByPath deletes a project by project path or name and returns the client http response.
+// This is meant to be used over DeleteProject if the caller doesn't know the project id.
 func (gitlab *API) DeleteProjectByPath(projectPath string) (*http.Response, error) {
 	_, project, err := gitlab.GetProjectByPath(projectPath)
 	if err != nil {

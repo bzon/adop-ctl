@@ -14,7 +14,9 @@ type API struct {
 	Token   string
 }
 
-// NewRequest creates an http API request to a gitlab instance
+// NewRequest creates an http API request to a gitlab instance.
+// It accepts http.NewRequest parameters and the expected status code of the request
+// and returns the response body of the Request and an error
 func (gitlab *API) NewRequest(method, requestURI string, body io.Reader, expectedStatusCode int) (*http.Response, error) {
 	req, err := http.NewRequest(method, gitlab.HostURL+"/"+requestURI, body)
 	if err != nil {

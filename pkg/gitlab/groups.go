@@ -26,7 +26,7 @@ type Group struct {
 	ParentID             int    `json:"parent_id,omitempty"`
 }
 
-// CreateGroup creates a group and returns the Group
+// CreateGroup creates a group and returns the client http response and a struct of type *Group.
 //
 // API doc: https://docs.gitlab.com/ce/api/groups.html#new-group
 func (gitlab *API) CreateGroup(g Group) (*http.Response, *Group, error) {
@@ -45,8 +45,9 @@ func (gitlab *API) CreateGroup(g Group) (*http.Response, *Group, error) {
 	return resp, &group, nil
 }
 
-// DeleteGroup deletes a group using group id
-// Gitlab API doc: https://docs.gitlab.com/ce/api/groups.html#remove-group
+// DeleteGroup deletes a group using group id and returns the client http response.
+//
+// API doc: https://docs.gitlab.com/ce/api/groups.html#remove-group
 func (gitlab *API) DeleteGroup(groupID int) (*http.Response, error) {
 	group := strconv.Itoa(groupID)
 	resp, err := gitlab.NewRequest("DELETE", "/groups/"+group, nil, http.StatusNoContent)
@@ -57,8 +58,8 @@ func (gitlab *API) DeleteGroup(groupID int) (*http.Response, error) {
 	return resp, nil
 }
 
-// DeleteGroupByPath deletes a group using group path
-// It calls SearchGroup to get find the group id and use it in DeleteGroup
+// DeleteGroupByPath deletes a group using group path and returns the client http response.
+// It calls SearchGroup to get find the group id and use it in DeleteGroup.
 func (gitlab *API) DeleteGroupByPath(path string) (*http.Response, error) {
 	_, group, err := gitlab.SearchGroup(path)
 	if err != nil {
@@ -74,7 +75,7 @@ func (gitlab *API) DeleteGroupByPath(path string) (*http.Response, error) {
 	return nil, fmt.Errorf("no group id found for group path %s", path)
 }
 
-// SearchGroup searches for a group given the group path and returns the Group found
+// SearchGroup searches for a group given the group path and returns the client http response and a struct of type *Group.
 //
 // API doc: https://docs.gitlab.com/ce/api/groups.html#search-for-group
 func (gitlab *API) SearchGroup(path string) (*http.Response, *Group, error) {
@@ -96,8 +97,9 @@ func (gitlab *API) SearchGroup(path string) (*http.Response, *Group, error) {
 	return nil, nil, fmt.Errorf("%s group not found", path)
 }
 
-// MemberExistsInGroup searches for a gitlab member in a group given a userID and groupID and returns if member is found or not
-// Gitlab API doc: https://docs.gitlab.com/ce/api/members.html#list-all-members-of-a-group-or-project
+// MemberExistsInGroup searches for a gitlab member in a group given a userID and groupID and returns a boolean value.
+//
+// API doc: https://docs.gitlab.com/ce/api/members.html#list-all-members-of-a-group-or-project
 func (gitlab *API) MemberExistsInGroup(userID, groupID int) (bool, error) {
 	resp, err := gitlab.NewRequest(
 		"GET",

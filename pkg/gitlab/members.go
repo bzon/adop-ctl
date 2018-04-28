@@ -5,7 +5,8 @@ import (
 	"strconv"
 )
 
-// AddMemberToGroup adds a user to a group. It also returns the uid of the added member and the uid of the group
+// AddMemberToGroup adds a user to a group.
+// It returns the client http response, the uid of the added member and the uid of the group.
 //
 // API doc: https://docs.gitlab.com/ce/api/members.html#add-a-member-to-a-group-or-project
 func (gitlab *API) AddMemberToGroup(member User, groupPath string) (*http.Response, int, int, error) {
@@ -31,7 +32,8 @@ func (gitlab *API) AddMemberToGroup(member User, groupPath string) (*http.Respon
 	return resp, user.ID, group.ID, nil
 }
 
-// RemoveMemberFromGroup removes a user from a group
+// RemoveMemberFromGroup removes the username membership from the groupPath.
+// It returns the client http response, user id and group id of the removed member.
 //
 // API doc: https://docs.gitlab.com/ce/api/members.html#remove-a-member-from-a-group-or-project
 func (gitlab *API) RemoveMemberFromGroup(username string, groupPath string) (*http.Response, int, int, error) {
