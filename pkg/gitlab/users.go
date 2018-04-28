@@ -40,8 +40,10 @@ const (
 	OwnerLevel
 )
 
-// CreateUser creates a gitlab user
-// Gitlab API doc: https://docs.gitlab.com/ce/api/users.html#user-creation
+// CreateUser creates a gitlab user by accepting a struct of type User.
+// It returns the client http response and a struct of type *User.
+//
+// API doc: https://docs.gitlab.com/ce/api/users.html#user-creation
 func (gitlab *API) CreateUser(user User) (*http.Response, *User, error) {
 	userBytes, err := json.Marshal(user)
 	if err != nil {
@@ -61,8 +63,9 @@ func (gitlab *API) CreateUser(user User) (*http.Response, *User, error) {
 	return resp, &user, nil
 }
 
-// DeleteUser deletes a user in gitlab
-// Gitlab API doc: https://docs.gitlab.com/ce/api/users.html#user-deletion
+// DeleteUser deletes a registered user by accepting a user id and returns the client http response.
+//
+// API doc: https://docs.gitlab.com/ce/api/users.html#user-deletion
 func (gitlab *API) DeleteUser(userID int) (*http.Response, error) {
 	resp, err := gitlab.NewRequest("DELETE", "/users/"+strconv.Itoa(userID), nil, http.StatusNoContent)
 	if err != nil {
@@ -71,7 +74,8 @@ func (gitlab *API) DeleteUser(userID int) (*http.Response, error) {
 	return resp, nil
 }
 
-// DeleteUserByUsername deletes a user in gitlab by username search
+// DeleteUserByUsername deletes a user by accepting a username and returns the client http response.
+// This is meant to be used over DeleteUser if the caller doesn't know the user id.
 func (gitlab *API) DeleteUserByUsername(userName string) (*http.Response, error) {
 	resp, user, err := gitlab.SearchUserByEmailOrUserName(userName)
 	if err != nil {
@@ -84,8 +88,10 @@ func (gitlab *API) DeleteUserByUsername(userName string) (*http.Response, error)
 	return resp, nil
 }
 
-// SearchUserByEmailOrUserName searches for a user and returns the user data
-// Gitlab API doc: https://docs.gitlab.com/ce/api/users.html#single-user
+// SearchUserByEmailOrUserName searches for a user by accepting a username or an email.
+// It returns the client http response, and a struct of type *User that was found.
+//
+// API doc: https://docs.gitlab.com/ce/api/users.html#single-user
 func (gitlab *API) SearchUserByEmailOrUserName(userToSearch string) (*http.Response, *User, error) {
 	// You can search for users by email or username with: /users?search=John
 	var searchParam string
@@ -101,7 +107,9 @@ func (gitlab *API) SearchUserByEmailOrUserName(userToSearch string) (*http.Respo
 	defer resp.Body.Close()
 
 	var users []User
-	json.NewDecoder(resp.Body).Decode(&users)
+	if err := json.NewDecoder(resp.Body).Decode(&users); err != nil {
+		return nil, nil, err
+	}
 	if len(users) > 0 {
 		return resp, &users[0], nil
 	}
