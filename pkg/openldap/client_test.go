@@ -1,12 +1,10 @@
 package openldap
 
-import "os"
-
-var ldapDomain = os.Getenv("LDAP_FULL_DOMAIN")
+var ldapDomain = "dc=ldap,dc=adop,dc=com"
 var openldap = &Client{
 	Host:         "localhost",
 	Scheme:       "tcp",
 	Port:         389,
 	bindUser:     "cn=admin," + ldapDomain,
-	bindPassword: os.Getenv("SLAPD_PASSWORD"),
+	bindPassword: "123qwe123",
 }

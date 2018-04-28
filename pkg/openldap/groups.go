@@ -2,6 +2,7 @@ package openldap
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/bzon/adop-ctl/pkg/gitlab"
@@ -74,10 +75,14 @@ func (openldap *Client) SyncGitlabGroup(ldapGroup []Group, GitlabAPI gitlab.API)
 		}
 
 		// Delete group
-		GitlabAPI.DeleteGroupByPath(gitlabGroup.Path)
+		if _, err := GitlabAPI.DeleteGroupByPath(gitlabGroup.Path); err != nil {
+			return err
+		}
 
 		// Create Group
-		GitlabAPI.CreateGroup(gitlabGroup)
+		if _, _, err := GitlabAPI.CreateGroup(gitlabGroup); err != nil {
+			return err
+		}
 
 		// Loop through group
 		for i := 0; i < len(ldapGroup[j].uniqueMember); i++ {
@@ -91,7 +96,11 @@ func (openldap *Client) SyncGitlabGroup(ldapGroup []Group, GitlabAPI gitlab.API)
 			}
 
 			// add member to group
-			GitlabAPI.AddMemberToGroup(member, gitlabGroup.Path)
+			_, uid, gid, err := GitlabAPI.AddMemberToGroup(member, gitlabGroup.Path)
+			if err != nil {
+				return err
+			}
+			log.Printf("ldap_client: username=%s (gitlab user id %d) has been added to group=%s (gitlab group id %d) with access_level=%d\n", member.Username, uid, gitlabGroup.Path, gid, member.AccessLevel)
 
 		}
 	}
