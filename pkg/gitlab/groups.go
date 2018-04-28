@@ -12,11 +12,11 @@ import (
 //
 // API doc: https://docs.gitlab.com/ce/api/groups.html#details-of-a-group
 type Group struct {
-	ID                   int
-	Name                 string
-	Path                 string
-	Description          string
-	Visibility           string
+	ID                   int    `json:"id"`
+	Name                 string `json:"name"`
+	Path                 string `json:"path"`
+	Description          string `json:"description"`
+	Visibility           string `json:"visibility"`
 	LFSEnabled           bool   `json:"lfs_enabled"`
 	AvatarURL            string `json:"avatar_url,omitempty"`
 	WebURL               string `json:"web_url"`
