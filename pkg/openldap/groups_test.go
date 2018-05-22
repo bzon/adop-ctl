@@ -2,16 +2,14 @@ package openldap
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
-	"github.com/bzon/adop-ctl/pkg/gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
-var git = gitlab.API{
-	HostURL: "http://localhost:10080/api/v4",
-	Token:   os.Getenv("GITLAB_PRIVATE_TOKEN"),
-}
+var basehttpURL = "http://localhost:10080"
+var gitlabUsername = "root"
+var gitlabPassword = "123qwe123"
 
 var ldapGroup = Group{
 	CN:           "one.direction",
@@ -48,6 +46,15 @@ func TestGetGroupList(t *testing.T) {
 }
 
 func TestSyncGroup(t *testing.T) {
+	git, err := gitlab.NewBasicAuthClient(nil,
+		basehttpURL,
+		gitlabUsername,
+		gitlabPassword,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// get group list
 	groupList, err := openldap.GetGroupList(ldapDomain)
 	if err != nil {

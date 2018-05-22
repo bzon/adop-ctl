@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/bzon/adop-ctl/pkg/gitlab"
+	"github.com/xanzy/go-gitlab"
 	ldap "gopkg.in/ldap.v2"
 )
 
@@ -65,42 +65,54 @@ func (openldap *Client) GetGroupList(baseDN string) ([]string, error) {
 }
 
 // SyncGitlabGroup accepts list of groups
-func (openldap *Client) SyncGitlabGroup(ldapGroup []Group, GitlabAPI gitlab.API) error {
+func (openldap *Client) SyncGitlabGroup(ldapGroup []Group, GitlabAPI *gitlab.Client) error {
 
 	// loop through groups
 	for j := 0; j < len(ldapGroup); j++ {
-		gitlabGroup := gitlab.Group{
-			Name: ldapGroup[j].CN,
-			Path: "ldap_" + ldapGroup[j].CN,
+		groupPath := "ldap_" + ldapGroup[j].CN
+		gitlabGroup := gitlab.CreateGroupOptions{
+			Name:        gitlab.String(ldapGroup[j].CN),
+			Path:        gitlab.String(groupPath),
+			Description: gitlab.String("Auto generated group \"" + ldapGroup[j].CN + "\" by ldap sync"),
+			Visibility:  gitlab.Visibility(gitlab.PrivateVisibility),
 		}
 
 		// Delete group
-		if _, err := GitlabAPI.DeleteGroupByPath(gitlabGroup.Path); err != nil {
-			return err
-		}
+		GitlabAPI.Groups.DeleteGroup(groupPath)
 
 		// Create Group
-		if _, _, err := GitlabAPI.CreateGroup(gitlabGroup); err != nil {
+		group, _, err := GitlabAPI.Groups.CreateGroup(&gitlabGroup)
+		if err != nil {
 			return err
 		}
 
 		// Loop through group
 		for i := 0; i < len(ldapGroup[j].uniqueMember); i++ {
 			// concatinate cn to get username
-			username := strings.Split(strings.Split(ldapGroup[j].uniqueMember[i], ",")[0], "=")[1]
+			name := strings.Split(strings.Split(ldapGroup[j].uniqueMember[i], ",")[0], "=")[1]
 
-			member := gitlab.User{
-				Name:        username,
-				Username:    username,
-				AccessLevel: gitlab.OwnerLevel,
+			// get user id
+			opts := &gitlab.ListUsersOptions{
+				Username: &name,
+			}
+
+			userlist, _, _ := GitlabAPI.Users.ListUsers(opts)
+			// if more than 1 result is returned or no entry is found
+			if len(userlist) > 2 || len(userlist) == 0 {
+				return err
+			}
+
+			add := &gitlab.AddGroupMemberOptions{
+				UserID:      gitlab.Int(userlist[0].ID),
+				AccessLevel: gitlab.AccessLevel(30),
 			}
 
 			// add member to group
-			_, uid, gid, err := GitlabAPI.AddMemberToGroup(member, gitlabGroup.Path)
+			_, _, err := GitlabAPI.GroupMembers.AddGroupMember(groupPath, add)
 			if err != nil {
 				return err
 			}
-			log.Printf("ldap_client: username=%s (gitlab user id %d) has been added to group=%s (gitlab group id %d) with access_level=%d\n", member.Username, uid, gitlabGroup.Path, gid, member.AccessLevel)
+			log.Printf("ldap_client: username=%s (gitlab user id %d) has been added to group=%s (gitlab group id %d) with access_level=%v\n", name, userlist[0].ID, groupPath, group.ID, add.AccessLevel)
 
 		}
 	}
